@@ -25,7 +25,16 @@ void processInput(GLFWwindow *window)
         glfwSetWindowShouldClose(window, true);
 }
 
-// OpenGL Shading Language GLSL
+/*
+OpenGL Shading Language GLSL:
+
+The vertex shader decide the color for the fragment shader by using Ins and Outs. 
+
+So if we want to send data from one shader to the other we'd have to declare an output in the sending shader 
+and a similar input in the receiving shader. When the types and the names are equal on both sides OpenGL 
+will link those variables together and then it is possible to send data between shaders.
+*/
+
 const char *vertexShaderSource = "#version 330 core\n"
     "layout (location = 0) in vec3 aPos;\n"
     "out vec4 vertexColor;"
