@@ -1,0 +1,216 @@
+//
+//  main.cpp
+//  openGL
+//
+//  Created by kokofan on 10/24/19.
+//  Copyright © 2019 koko Fan. All rights reserved.
+//
+
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+#include <iostream>
+#include <cmath>
+
+
+/* Callback function, it will be called when the size of window changed */
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+    // Viewpoint, used to set the dimension of window
+    glViewport(0, 0, width, height);
+}
+
+/* Check if user press the esc button, if it is, close the window */
+void processInput(GLFWwindow *window)
+{
+    if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
+}
+
+// OpenGL Shading Language GLSL
+const char *vertexShaderSource = "#version 330 core\n"
+    "layout (location = 0) in vec3 aPos;\n"
+    "void main()\n"
+    "{\n"
+    "    gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+    "}\0";
+    
+/* Create a fragment shader by using uniform.
+This color will change gradually with time. */
+const char *fragmentShaderSource = "#version 330 core\n"
+    "out vec4 FragColor;\n"
+    "uniform vec4 ourColor;"
+    "void main()\n"
+    "{\n"
+    "   FragColor = ourColor;\n"
+    "}\n\0";
+
+// Main function
+int main(void)
+{
+    GLFWwindow* window;
+    
+    /* Initialize the library */
+    if (!glfwInit())
+        return -1;
+    
+    /* Initialize and configuration, tell GLFW openGL 3.3 will be used */
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    /* Fix compilation on MAC OS */
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    
+    /* Create a windowed mode window and its OpenGL context */
+    window = glfwCreateWindow(800, 600, "Hello World", NULL, NULL);
+    if (!window)
+    {
+        std::cout << "Failed to create a window" << std::endl;
+        glfwTerminate();
+        return -1;
+    }
+    
+    /* Make the window's context current */
+    glfwMakeContextCurrent(window);
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    
+    /* glew: load all OpenGL function pointers */
+    if (glewInit() != GLEW_OK)
+    {
+        std::cout << "Error!" << std::endl;
+        return -1;
+    }
+    
+    /* Print out the current version of OpenGL */
+    std::cout << glGetString(GL_VERSION) << std::endl;
+    
+    /* Create a vertex shader object */
+    int vertexShader;
+    vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    
+    /* Compile shader Source */
+    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+    glCompileShader(vertexShader);
+    
+    /* Check if glCompileShader is successful */
+    int success;
+    char infoLog[512];
+    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+    
+    if(!success)
+    {
+        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+    }
+    
+    /* Create a fragment shader object */
+    int fragmentShader;
+    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    
+    /* Compile shader Source */
+    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+    glCompileShader(fragmentShader);
+    
+    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+    
+    if(!success)
+    {
+        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+        std::cout << "ERROR::SHADER::FRAGMEMT::COMPILATION_FAILED\n" << infoLog << std::endl;
+    }
+
+    
+    /* Create a shader program */
+    int shaderProgram;
+    shaderProgram = glCreateProgram();
+
+    // Attach previous two shaders and link them
+    glAttachShader(shaderProgram, vertexShader);
+    glAttachShader(shaderProgram, fragmentShader);
+    glLinkProgram(shaderProgram);
+    
+    
+    /* Check if shader program is successful */
+    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    if(!success)
+    {
+        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+    }
+    
+    /* Delete vertex and fragment shaders */
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+    
+
+    /* The positions of vertexes */
+    
+    float positions[] = {
+        -0.5f, -0.5f, 0.0f, // left
+         0.5f, -0.5f, 0.0f, // right
+         0.0f,  0.5f, 0.0f  // top
+    };
+    
+    /* Vertex buffer object, it will store a lot of vertex in GPU memory,
+     and send them to graphic card*/
+    /* VAO(Vertex Array Object), VBO(Vertex Buffer Object),
+     EBO(Element Buffer Object)*/
+    unsigned int VBO, VAO;
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+
+    // Bind the buffer to GL_ARRAY_BUFFER, and Vertex
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(positions), positions, GL_STATIC_DRAW);
+
+    // Copy vertexes data to buffer
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+    glEnableVertexAttribArray(0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+    
+    
+    /* Loop until the user closes the window */
+    while (!glfwWindowShouldClose(window))
+    {
+        
+        processInput(window);
+        
+        /* Render here */
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+        
+        /* Active this shader program */
+        glUseProgram(shaderProgram);
+        
+        /* Update the uniform color 
+        1) retrieve the running time in seconds via glfwGetTime().
+        2) query for the location of the ourColor uniform using glGetUniformLocation.
+        3) set the uniform value using the glUniform4f function.
+        */
+        float timeValue = glfwGetTime();
+        float greenValue = sin(timeValue)/2.0f + 0.5f;
+        int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+        
+        glBindVertexArray(VAO);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+        
+        glBindVertexArray(0);
+        
+        /* Swap front and back buffers */
+        glfwSwapBuffers(window);
+        
+        /* Poll for and process events */
+        glfwPollEvents();
+    }
+    
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    
+    glfwTerminate();
+    return 0;
+}
+
+
