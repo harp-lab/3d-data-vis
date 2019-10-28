@@ -67,7 +67,7 @@ int main(void)
     /* Print out the current version of OpenGL */
     std::cout << glGetString(GL_VERSION) << std::endl;
     
-    Shader ourShader("/Users/kokofan/Documents/Contour_Tree/openGL/openGL/shader.vs", "/Users/kokofan/Documents/Contour_Tree/openGL/openGL/shader.fs"); // read
+    Shader ourShader("./shader.vs", "./shader.fs"); // read
     
     /* The positions and colors of vertexes */
     float positions[] = {
