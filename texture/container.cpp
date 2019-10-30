@@ -77,10 +77,10 @@ int main()
     /* The positions and colors of vertexes */
     float positions[] = {
         // positions          // colors           // texture coords
-        0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,    2.0f, 2.0f,   // 右上
-        0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,    2.0f, 0.0f,   // 右下
-        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // 左下
-        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 2.0f    // 左上
+        0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,    0.55f, 0.55f,   
+        0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,    0.55f, 0.45f,   
+        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.45f, 0.45f,
+        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.45f, 0.55f  
     };
     
     unsigned int indices[] = {
