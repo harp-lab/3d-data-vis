@@ -32,11 +32,56 @@ glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f); // up vector
 float deltaTime = 0.0f;
 float lastframe = 0.0f;
 
+// mouse
+bool firstMouse = true;
+
+/* yaw is the angle between x and z
+ yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector
+ pointing to the right so we initially rotate a bit to the left. */
+float yaw = -90.0f;
+float pitch =  0.0f; /* pitch is the angle between y and x/z */
+float lastX = 800.0f / 2.0; // depends on the width of screen
+float lastY = 600.0f/ 2.0;  // depends on the height of screen
+float fov = 45.0f;  // perjection
+
 /* Callback function, it will be called when the size of window changed */
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     // Viewpoint, used to set the dimension of window
     glViewport(0, 0, width, height);
+}
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+{
+    if(firstMouse)
+    {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+    
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+    lastX = xpos;
+    lastY = ypos;
+    
+    float sensitivity = 0.05f;
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+    
+    yaw += xoffset;
+    pitch += yoffset;
+    
+    if(pitch > 89.0f)
+        pitch = 89.0f;
+    if(pitch < -89.0f)
+        pitch = -89.0f;
+    
+    glm::vec3 front;
+    front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+    front.y = sin(glm::radians(pitch));
+    front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    cameraFront = glm::normalize(front);
 }
 
 /* Check if user press the esc button, if it is, close the window */
@@ -77,6 +122,16 @@ void processInput(GLFWwindow *window)
     }
 }
 
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    if(fov >= 1.0f && fov <= 45.0f)
+        fov -= yoffset;
+    if(fov <= 1.0f)
+        fov = 1.0f;
+    if(fov >= 45.0f)
+        fov = 45.0f;
+}
+
 // Main function
 int main()
 {
@@ -107,6 +162,12 @@ int main()
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetScrollCallback(window, scroll_callback);
+    
+    // tell GLFW to capture our mouse
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    
     
     /* glew: load all OpenGL function pointers */
     if (glewInit() != GLEW_OK)
@@ -126,7 +187,7 @@ int main()
     
     /* The positions and colors of vertexes */
     float positions[] = {
-        // positions          // colors           // texture coords
+        // positions         // texture coords
         -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
@@ -186,9 +247,8 @@ int main()
 
     /* Vertex buffer object, it will store a lot of vertex in GPU memory,
      and send them to graphic card*/
-    /* VAO(Vertex Array Object), VBO(Vertex Buffer Object),
-     EBO(Element Buffer Object)*/
-    unsigned int VBO, VAO, EBO;
+    /* VAO(Vertex Array Object), VBO(Vertex Buffer Object)*/
+    unsigned int VBO, VAO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
 
@@ -204,15 +264,15 @@ int main()
     // texture coord attribute
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
-    
+
     unsigned int texture1, texture2;
     // texture 1
     // ---------
     glGenTextures(1, &texture1);
     glBindTexture(GL_TEXTURE_2D, texture1);
     // set the texture wrapping parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);    // set texture wrapping to GL_REPEAT (default wrapping method)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);    // set texture wrapping to GL_REPEAT (default wrapping method)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     // set texture filtering parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -280,7 +340,6 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
         /* Active this shader program */
-        //ourShader.setFloat("xOffset", 0.3f);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture1);
         glActiveTexture(GL_TEXTURE1);
@@ -288,9 +347,11 @@ int main()
         
         // set the texture mix value in the shader
         ourShader.setFloat("mixValue", mixValue);
-
+        
+        ourShader.use();
+        
         glm::mat4 projection = glm::mat4(1.0f);
-        projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        projection = glm::perspective(glm::radians(fov), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         
         glm::mat4 view;
         view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
@@ -303,9 +364,10 @@ int main()
         {
             glm::mat4 model = glm::mat4(1.0f);
             model = glm::translate(model, cubePositions[i]);
-            float angle = 20.0f * (i + 1);
-            model = glm::rotate(model, angle, glm::vec3(1.0f, 0.3f, 0.5f));
+            float angle = 20.0f * (i);
+            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
             ourShader.setMat4("model", model);
+            
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
         
@@ -320,7 +382,6 @@ int main()
     
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &EBO);
     
     glfwTerminate();
     return 0;
