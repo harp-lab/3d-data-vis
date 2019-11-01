@@ -1,4 +1,4 @@
-##loading 3D object file 
+## Loading 3D object file 
 
 This project is used to load 3D object file. 
 
