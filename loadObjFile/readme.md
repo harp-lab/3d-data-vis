@@ -37,7 +37,7 @@ Two simple shaders: `shader.vs` and `shader.fs`.<br>
 The entry of this project is `main.cpp`. <br> 
 
 Here is the running result:<br> 
-![Result]()
+![Result](https://github.com/KokoFan16/openGL/blob/master/loadObjFile/foot.png)
 
 
 
