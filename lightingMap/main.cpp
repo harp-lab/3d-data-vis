@@ -50,6 +50,7 @@ float angleZ = 0.0f;
 
 // light location
 glm::vec3 lightPos(0.8f, 0.5f, 1.0f);
+//glm::vec3 lightPos(0.6f, 0.0f, 2.0f);
 
 int main()
 {
@@ -148,7 +149,7 @@ int main()
         -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
         -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
     };
-    
+       
     // A object used to cast
     unsigned int VBO, VAO;
     glGenVertexArrays(1, &VAO);
@@ -162,7 +163,7 @@ int main()
     // position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), 0);
     glEnableVertexAttribArray(0);
-    
+
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
     
@@ -182,12 +183,14 @@ int main()
     // -----------------------------------------------------------------------------
     unsigned int diffuseMap = loadTexture("./container2.png");
     unsigned int specularMap = loadTexture("./container2_specular.png");
+    unsigned int emissionMap = loadTexture("./matrix.jpg");
     
     // shader configuration
     // --------------------
     ourShader.use();
     ourShader.setInt("material.diffuse", 0);
     ourShader.setInt("material.specular", 1);
+    ourShader.setInt("material.emission", 2);
     
     
     // render loop
@@ -238,9 +241,12 @@ int main()
         // bind diffuse map
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, diffuseMap);
+        // bind specular map
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, specularMap);
-        
+        // bind emission map
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, emissionMap);
         // render boxes
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
