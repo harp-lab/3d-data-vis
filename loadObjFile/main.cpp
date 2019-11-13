@@ -22,13 +22,12 @@
 #include "shader.h"
 #include "camera.h"
 
-// functions define
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
 
-// the width and heigh of window
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
@@ -42,54 +41,64 @@ bool firstMouse = true;
 float deltaTime = 0.0f;
 float lastframe = 0.0f;
 
-// angles in x axle, y axle, and z axle
 float angleX = 0.0f;
 float angleY = 0.0f;
 float angleZ = 0.0f;
 
-// load object file
-void loadObj(std::string filename,  std::vector<glm::vec3> &positions)
+glm::vec3 lightPos(0.6f, 0.0f, 2.0f);
+
+
+void loadObj(std::string filename,  std::vector<glm::vec3> &positions, std::vector<glm::vec3> &norms)
 {
-    // store the temporary vetexes position data
-    std::vector<glm::vec3> temp_positions;
     
-    // file stream
+    std::vector<glm::vec3> temp_positions;
+    std::vector<glm::vec3> temp_norms;
+    
     std::ifstream infile(filename);
     
-    // shows up error message if the file cannot be opened
     if(!infile)
     {
         std::cerr << "Cannot open the File: " << filename << std::endl;
     }
     
-    // string for each line
     std::string str;
     
-    // read file line by line
     while (std::getline(infile, str))
     {
         std::istringstream ss(str);
         
-        // vertexes
         if(ss.peek() == 'v')
         {
             ss.ignore();
             
-            float x, y, z;
-            ss >> x >> y >> z;
-            glm::vec3 vertex((x - 127.5)/127.5, (y - 127.5)/127.5, (z - 127.5)/127.5);
-            temp_positions.push_back(vertex);
+            if(ss.peek() == 'n')
+            {
+                ss.ignore();
+                glm::vec3 norm;
+                ss >> norm.x >> norm.y >> norm.z;
+                temp_norms.push_back(norm);
+            }
+            else
+            {
+                glm::vec3 vertex;
+                ss >> vertex.x >> vertex.y >> vertex.z;
+                temp_positions.push_back(vertex);
+            }
         }
         
-        // faces (each face is a trangles)
         else if(ss.peek() == 'f')
         {
             float x, y, z;
             ss.ignore();
             ss >> x >> y >> z;
+            
             positions.push_back(temp_positions[x - 1]);
             positions.push_back(temp_positions[y - 1]);
             positions.push_back(temp_positions[z - 1]);
+            
+            norms.push_back(temp_norms[x - 1]);
+            norms.push_back(temp_norms[y - 1]);
+            norms.push_back(temp_norms[z - 1]);
         }
     }
 }
@@ -97,11 +106,12 @@ void loadObj(std::string filename,  std::vector<glm::vec3> &positions)
 // Main function
 int main()
 {
-    std::string filename = "./test3d.obj"; // file path
-    std::vector<glm::vec3> positions; // vertexes data
-    loadObj(filename, positions);
     
-    // Initialize window
+    std::string filename = "./cube.obj";
+    std::vector<glm::vec3> positions;
+    std::vector<glm::vec3> norms;
+    loadObj(filename, positions, norms);
+    
     GLFWwindow* window;
 
     /* Initialize the library */
@@ -145,11 +155,15 @@ int main()
     glEnable(GL_DEPTH_TEST);
 
     Shader ourShader("./shader.vs",
-                     "./shader.fs"); // read shader
+                     "./shader.fs"); // read
+    
+    Shader lampShader("./lightShader.vs",
+                      "./lightShader.fs");
     
     /* Vertex buffer object, it will store a lot of vertex in GPU memory,
-     and send them to graphic card */
-    /* VAO(Vertex Array Object), VBO(Vertex Buffer Object) */
+     and send them to graphic card*/
+    /* VAO(Vertex Array Object), VBO(Vertex Buffer Object),
+     EBO(Element Buffer Object)*/
     unsigned int VBO, VAO;
     // Generate a buffer and vertex object
     glGenVertexArrays(1, &VAO);
@@ -163,19 +177,23 @@ int main()
     // Copy vertexes data to buffer
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, 3 * sizeof(float), 0);
     glEnableVertexAttribArray(0);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+    
+    // The buffer of normal vector
+    unsigned int normVBO;
+    glGenBuffers(1, &normVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, normVBO);
+    glBufferData(GL_ARRAY_BUFFER, norms.size() * sizeof(glm::vec3), &norms[0], GL_STATIC_DRAW);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_TRUE, 3 * sizeof(float), 0);
+    glEnableVertexAttribArray(1);
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
-        // calculate the difference between current time and last time
+        
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastframe;
         lastframe = currentFrame;
-        
-        // keyboard response
+
         processInput(window);
 
         /* Render here */
@@ -185,6 +203,18 @@ int main()
         /* Active this shader program */
         //ourShader.setFloat("xOffset", 0.3f);
         ourShader.use();
+   
+        ourShader.setVec3("light.direction", -0.2f, -1.0f, -0.3f);
+        ourShader.setVec3("viewPos", camera.Position);
+        
+        ourShader.setVec3("material.ambient", 0.49225f, 0.49225f, 0.49225f);
+        ourShader.setVec3("material.diffuse", 0.50754f, 0.50754f, 0.50754f);
+        ourShader.setVec3("material.specular", 0.508273f, 0.508273f, 0.508273f);
+        ourShader.setFloat("material.shininess", 32.0f);
+        
+        ourShader.setVec3("light.ambient", 1.0f, 1.0f, 1.0f); // note that all light colors are set at full intensity
+        ourShader.setVec3("light.diffuse", 1.0f, 1.0f, 1.0f);
+        ourShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
         
         //projectiom
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
@@ -200,7 +230,7 @@ int main()
         // view
         glm::mat4 view = camera.GetViewMatrix();
         ourShader.setMat4("view", view);
-
+        
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, (int)positions.size());
 
