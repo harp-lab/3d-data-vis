@@ -157,9 +157,6 @@ int main()
     Shader ourShader("./shader.vs",
                      "./shader.fs"); // read
     
-    Shader lampShader("./lightShader.vs",
-                      "./lightShader.fs");
-    
     /* Vertex buffer object, it will store a lot of vertex in GPU memory,
      and send them to graphic card*/
     /* VAO(Vertex Array Object), VBO(Vertex Buffer Object),
