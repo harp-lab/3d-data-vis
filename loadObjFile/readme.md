@@ -5,7 +5,10 @@ This project is used to load 3D object file.
 #### Updating (11/13/2019): Add lighting
     For adding light for 3D object, we need normal vector of faces, which is a vector perpendicular to the surface at a given point, as shown below:
     
-![Result]() 
+![Result](https://github.com/KokoFan16/openGL/blob/master/loadObjFile/normal.png) 
+
+    Here is the result:
+![Result](https://github.com/KokoFan16/openGL/blob/master/loadObjFile/footWithLighting.png) 
 
     Here is some example about the object file format:
 
