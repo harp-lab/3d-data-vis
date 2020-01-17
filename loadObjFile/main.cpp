@@ -153,8 +153,8 @@ int main()
     
     glEnable(GL_DEPTH_TEST);
 
-    Shader ourShader("/Users/kokofan/Documents/Contour_Tree/loadObj/loadObj/shader.vs",
-                     "/Users/kokofan/Documents/Contour_Tree/loadObj/loadObj/shader.fs"); // read
+    Shader ourShader("./shader.vs",
+                     "./shader.fs"); // read
     
     /* Vertex buffer object, it will store a lot of vertex in GPU memory,
      and send them to graphic card*/
