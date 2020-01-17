@@ -101,7 +101,6 @@ void loadObj(std::string filename,  std::vector<glm::vec3> &positions, std::vect
             norms.push_back(temp_norms[z - 1]);
         }
     }
-}
 
 // Main function
 int main()
@@ -154,8 +153,8 @@ int main()
     
     glEnable(GL_DEPTH_TEST);
 
-    Shader ourShader("./shader.vs",
-                     "./shader.fs"); // read
+    Shader ourShader("/Users/kokofan/Documents/Contour_Tree/loadObj/loadObj/shader.vs",
+                     "/Users/kokofan/Documents/Contour_Tree/loadObj/loadObj/shader.fs"); // read
     
     /* Vertex buffer object, it will store a lot of vertex in GPU memory,
      and send them to graphic card*/
@@ -175,14 +174,13 @@ int main()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_TRUE, 3 * sizeof(float), 0);
     glEnableVertexAttribArray(0);
     
-    // The buffer of normal vector
     unsigned int normVBO;
     glGenBuffers(1, &normVBO);
     glBindBuffer(GL_ARRAY_BUFFER, normVBO);
     glBufferData(GL_ARRAY_BUFFER, norms.size() * sizeof(glm::vec3), &norms[0], GL_STATIC_DRAW);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_TRUE, 3 * sizeof(float), 0);
     glEnableVertexAttribArray(1);
-
+    
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
@@ -200,11 +198,11 @@ int main()
         /* Active this shader program */
         //ourShader.setFloat("xOffset", 0.3f);
         ourShader.use();
-   
+        
         ourShader.setVec3("light.direction", -0.2f, -1.0f, -0.3f);
         ourShader.setVec3("viewPos", camera.Position);
         
-        ourShader.setVec3("material.ambient", 0.49225f, 0.49225f, 0.49225f);
+        ourShader.setVec3("material.ambient", 0.62647, 0.628039f, 0.55627f);
         ourShader.setVec3("material.diffuse", 0.50754f, 0.50754f, 0.50754f);
         ourShader.setVec3("material.specular", 0.508273f, 0.508273f, 0.508273f);
         ourShader.setFloat("material.shininess", 32.0f);
@@ -227,7 +225,7 @@ int main()
         // view
         glm::mat4 view = camera.GetViewMatrix();
         ourShader.setMat4("view", view);
-        
+
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, (int)positions.size());
 
@@ -313,5 +311,6 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
     camera.ProcessMouseScroll(yoffset);
 }
+
 
 
