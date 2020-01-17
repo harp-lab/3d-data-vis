@@ -13,8 +13,6 @@
 
 #include "shader_s.h"
 #include "camera.h"
-#include "stb_image.h"
-
 
 
 int X = 64;
