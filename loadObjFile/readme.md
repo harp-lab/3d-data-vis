@@ -3,7 +3,7 @@
 This project is used to load 3D object file. 
 #### Updating (11/17/2019): Vertex normals instead of Face normals
 
-![update]() 
+![update](https://github.com/KokoFan16/openGL/blob/master/loadObjFile/pics/vertexNormal.png) 
 
 
 #### Updating (11/13/2019): Add lighting
