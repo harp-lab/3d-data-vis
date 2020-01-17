@@ -1,6 +1,10 @@
 ## Loading 3D object file 
 
 This project is used to load 3D object file. 
+#### Updating (11/17/2019): Vertex normals instead of Face normals
+
+![update]() 
+
 
 #### Updating (11/13/2019): Add lighting
     For adding light for 3D object, we need normal vector of faces, which is a vector perpendicular to the surface at a given point, as shown below:
