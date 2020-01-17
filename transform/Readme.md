@@ -1,1 +1,1 @@
-![result](https://github.com/KokoFan16/openGL/new/master/transform/pics/result.gif)
+![result](https://github.com/KokoFan16/openGL/blob/master/transform/pics/result.gif)
