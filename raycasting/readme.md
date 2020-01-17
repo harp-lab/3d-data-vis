@@ -7,9 +7,13 @@ libs: glew, glfw, and glm
 
 This texture is used to calculate the exit points. Hence you can also get the direction by minus entry point.
 
-![backface]()
+![backface](https://github.com/KokoFan16/openGL/blob/master/raycasting/pics/backface.png)
 
-![frontface]()
+![frontface](https://github.com/KokoFan16/openGL/blob/master/raycasting/pics/frontface.png)
 
 - Load trasfer texture (color map) and volumn texture. 
 - Calculate accumulated opacity and color. 
+
+## Result
+![frontface](https://github.com/KokoFan16/openGL/blob/master/raycasting/pics/molecule.png)
+![frontface](https://github.com/KokoFan16/openGL/blob/master/raycasting/pics/head.png)
