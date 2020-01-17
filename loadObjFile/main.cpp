@@ -101,6 +101,7 @@ void loadObj(std::string filename,  std::vector<glm::vec3> &positions, std::vect
             norms.push_back(temp_norms[z - 1]);
         }
     }
+}
 
 // Main function
 int main()
