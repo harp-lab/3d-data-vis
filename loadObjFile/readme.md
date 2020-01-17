@@ -1,14 +1,18 @@
 ## Loading 3D object file 
 
 This project is used to load 3D object file. 
+#### Updating (11/17/2019): Vertex normals instead of Face normals
+
+![update](https://github.com/KokoFan16/openGL/blob/master/loadObjFile/pics/vertexNormal.png) 
+
 
 #### Updating (11/13/2019): Add lighting
     For adding light for 3D object, we need normal vector of faces, which is a vector perpendicular to the surface at a given point, as shown below:
     
-<img src="https://github.com/KokoFan16/openGL/blob/master/loadObjFile/normal.png" width="300" hegiht="200" align=center />
+<img src="https://github.com/KokoFan16/openGL/blob/master/loadObjFile/pics/normal.png" width="300" hegiht="200" align=center />
 
     Here is the result:
-![Result](https://github.com/KokoFan16/openGL/blob/master/loadObjFile/footWithLighting.png) 
+![Result](https://github.com/KokoFan16/openGL/blob/master/loadObjFile/pics/footWithLighting.png) 
 
     Here is some example about the object file format:
 
@@ -44,7 +48,7 @@ This project is used to load 3D object file.
     The entry of this project is `main.cpp`. <br> 
 
     Here is the running result:<br> 
-![Result](https://github.com/KokoFan16/openGL/blob/master/loadObjFile/foot.png)
+![Result](https://github.com/KokoFan16/openGL/blob/master/loadObjFile/pics/foot.png)
 
 
 
