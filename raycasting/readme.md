@@ -14,6 +14,12 @@ This texture is used to calculate the exit points. Hence you can also get the di
 - Load trasfer texture (color map) and volumn texture. 
 - Calculate accumulated opacity and color. 
 
+## Updata
+
+Add Gui (imGui)
+
+![demo](https://github.com/KokoFan16/openGL/blob/master/raycasting/pics/gui_demo.gif)
+
 ## Result
 ![frontface](https://github.com/KokoFan16/openGL/blob/master/raycasting/pics/molecule.png)
 ![frontface](https://github.com/KokoFan16/openGL/blob/master/raycasting/pics/head.png)
